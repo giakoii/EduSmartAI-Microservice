@@ -1,0 +1,28 @@
+# Bỏ qua thư mục build
+bin/
+obj/
+
+# Bỏ qua thư mục của IDE (Visual Studio, Rider, VS Code)
+.vs/
+.idea/
+.vscode/
+
+# Bỏ qua các file nhị phân
+*.exe
+*.dll
+*.pdb
+
+# Bỏ qua file hệ thống
+Thumbs.db
+.DS_Store
+
+# Bỏ qua file .env (biến môi trường)
+.env
+**/.env
+
+
+# Bỏ qua các file user settings
+*.user
+*.userosscache
+*.suo
+*.sln.docstates

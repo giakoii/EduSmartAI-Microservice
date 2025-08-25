@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.3.0" />
+      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
+      <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.0.0" />
+      <PackageReference Include="OpenIddict.Validation.SystemNetHttp" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BuildingBlocks.Messaging\BuildingBlocks.Messaging.csproj" />
+      <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.csproj" />
+      <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
+    </ItemGroup>
+
+</Project>
