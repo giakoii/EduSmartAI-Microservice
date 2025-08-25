@@ -1,6 +1,34 @@
+using BuildingBlocks.Messaging.Settings;
+using OpenIddict.Validation.AspNetCore;
+using Shared.Common.Utils.Const;
+
 namespace UserService.API.Extensions;
 
-public class AuthenticationExtensions
+public static class AuthenticationExtensions
 {
-    
+    public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
+    {
+        EnvLoader.Load();
+        services.AddAuthentication(options =>
+       {
+           options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+       });
+
+       // Configure token validation
+       services.AddOpenIddict()
+           .AddValidation(options =>
+           {
+               options.SetIssuer("http://localhost:5001/auth/");
+               options.AddAudiences("service_client");
+
+               options.UseIntrospection()
+                   .AddAudiences("service_client")
+                   .SetClientId("service_client")
+                   .SetClientSecret(Environment.GetEnvironmentVariable(ConstEnv.ClientSecret)!);
+
+               options.UseSystemNetHttp();
+               options.UseAspNetCore();
+           });
+        return services;
+    }
 }

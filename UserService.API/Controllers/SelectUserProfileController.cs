@@ -28,7 +28,7 @@ public class SelectUserProfileController : AbstractApiAsyncController<UserProfil
 
     [HttpGet]
     [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    public override async Task<UserProfileSelectResponse> ProcessRequest(UserProfileSelectQuery request)
+    public override async Task<UserProfileSelectResponse> ProcessRequest([FromQuery]UserProfileSelectQuery request)
     {
         return await ProcessRequest(request, _logger, new UserProfileSelectResponse());
     }

@@ -17,6 +17,7 @@ public static class AuthenticationExtensions
             })
             .AddServer(options =>
             {
+                options.SetIssuer(new Uri("http://localhost:5001/auth/")); 
                 ConfigureEndpoints(options);
                 ConfigureFlows(options);
                 ConfigureScopes(options);
@@ -34,7 +35,6 @@ public static class AuthenticationExtensions
                         {
                             var accessToken = context.Response.AccessToken;
                             var refreshToken = context.Response.RefreshToken;
-                            var idToken = context.Response.IdToken;
 
                             if (!string.IsNullOrEmpty(accessToken))
                             {
@@ -56,17 +56,6 @@ public static class AuthenticationExtensions
                                     Secure = true,
                                     SameSite = SameSiteMode.Strict,
                                     Expires = DateTimeOffset.UtcNow.AddHours(2),
-                                    Path = "/"
-                                });
-                            }
-                            if (!string.IsNullOrEmpty(idToken))
-                            {
-                                httpContext.Response.Cookies.Append("id_token", idToken, new CookieOptions
-                                {
-                                    HttpOnly = true,
-                                    Secure = true,
-                                    SameSite = SameSiteMode.Strict,
-                                    Expires = DateTimeOffset.UtcNow.AddHours(1),
                                     Path = "/"
                                 });
                             }

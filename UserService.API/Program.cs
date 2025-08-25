@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 
 // Configure services using extension methods
 builder.Services.AddDatabaseServices();
+builder.Services.AddAuthenticationServices();
 builder.Services.AddRepositoryServices();
 builder.Services.AddMessagingServices();
 builder.Services.AddSwaggerServices();

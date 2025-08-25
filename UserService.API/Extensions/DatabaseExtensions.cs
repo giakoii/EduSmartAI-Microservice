@@ -1,3 +1,4 @@
+using BuildingBlocks.Messaging.Settings;
 using JasperFx;
 using Marten;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
     {
+        EnvLoader.Load();
         var connectionString = Environment.GetEnvironmentVariable(ConstEnv.UserServiceDB);
         
         services.AddSingleton<IConnectionMultiplexer>(sp =>
