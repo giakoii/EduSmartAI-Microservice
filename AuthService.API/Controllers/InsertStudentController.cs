@@ -14,6 +14,7 @@ namespace AuthService.API.Controllers;
 public class InsertStudentController : AbstractApiAsyncControllerNotToken<StudentInsertCommand, StudentInsertResponse, string>
 {
     private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly IMediator _mediator;
 
     /// <summary>
     /// Constructor
@@ -34,5 +35,15 @@ public class InsertStudentController : AbstractApiAsyncControllerNotToken<Studen
     public override async Task<StudentInsertResponse> ProcessRequest(StudentInsertCommand request)
     {
         return await ProcessRequest(request, _logger, new StudentInsertResponse());
+    }
+
+    /// <summary>
+    /// Main processing
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public override async Task<StudentInsertResponse> Exec(StudentInsertCommand request)
+    {
+        return await _mediator.Send(request);
     }
 }

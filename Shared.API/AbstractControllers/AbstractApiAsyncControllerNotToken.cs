@@ -12,12 +12,17 @@ public abstract class AbstractApiAsyncControllerNotToken
     where TRequest : class
     where TResponse : AbstractApiResponse<TEntityResponse>
 {
-    protected IMediator _mediator;
-    
     /// <summary>
     /// API entry point
     /// </summary>
     public abstract Task<TResponse> ProcessRequest(TRequest request);
+    
+    /// <summary>
+    /// Main processing
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public abstract Task<TResponse> Exec(TRequest request);
 
     /// <summary>
     /// TemplateMethod
@@ -69,14 +74,5 @@ public abstract class AbstractApiAsyncControllerNotToken
         }
 
         return returnValue;
-    }
-
-    /// <summary>
-    /// Main processing (to be implemented in derived classes)
-    /// </summary>
-    private async Task<TResponse> Exec(TRequest request)
-    {
-        var result = await _mediator.Send(request);
-        return (TResponse)result!;
     }
 }

@@ -13,10 +13,22 @@ public abstract class AbstractApiAsyncController<TRequest, TResponse, TEntityRes
     where TResponse : AbstractApiResponse<TEntityResponse>
     where TRequest : class
 {
+    protected AbstractApiAsyncController(IIdentityService identityService)
+    {
+        _identityService = identityService;
+    }
+
     /// <summary>
     /// API entry point
     /// </summary>
     public abstract Task<TResponse> ProcessRequest(TRequest request);
+
+    /// <summary>
+    /// Main processing
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public abstract Task<TResponse> Exec(TRequest request);
 
     /// <summary>
     /// Authentication API client
@@ -27,11 +39,6 @@ public abstract class AbstractApiAsyncController<TRequest, TResponse, TEntityRes
     /// Identities information
     /// </summary>
     protected IdentityEntity _identityEntity;
-    
-    /// <summary>
-    /// Mediator for handling requests
-    /// </summary>
-    protected IMediator _mediator;
 
     /// <summary>
     /// TemplateMethod
@@ -98,14 +105,5 @@ public abstract class AbstractApiAsyncController<TRequest, TResponse, TEntityRes
         }
 
         return returnValue;
-    }
-
-    /// <summary>
-    /// Main processing (to be implemented in derived classes)
-    /// </summary>
-    private async Task<TResponse> Exec(TRequest request)
-    {
-        var result = await _mediator.Send(request);
-        return (TResponse)result!;
     }
 }
