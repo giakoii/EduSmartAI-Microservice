@@ -1,4 +1,4 @@
-using AuthService.Domain.WriteModels;
+using AuthService.Application.Interfaces;
 using BuildingBlocks.CQRS;
 using BuildingBlocks.Messaging.Events.UserLoginEvents;
 using MassTransit;
@@ -9,104 +9,82 @@ namespace AuthService.Application.Accounts.Commands.Logins;
 
 public class UserLoginCommandHandler : ICommandHandler<UserLoginCommand, UserLoginResponse>
 {
-    private readonly ICommandRepository<Account> _accountRepository;
-    private readonly ICommandRepository<Role> _roleRepository;
+    private readonly IAccountService _accountService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRequestClient<UserLoginEvent> _requestClient;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="accountRepository"></param>
-    /// <param name="roleRepository"></param>
+    /// <param name="accountService"></param>
     /// <param name="unitOfWork"></param>
     /// <param name="requestClient"></param>
-    public UserLoginCommandHandler(ICommandRepository<Account> accountRepository, ICommandRepository<Role> roleRepository,
-        IUnitOfWork unitOfWork, IRequestClient<UserLoginEvent> requestClient)
+    public UserLoginCommandHandler(IAccountService accountService, IUnitOfWork unitOfWork, IRequestClient<UserLoginEvent> requestClient)
     {
-        _accountRepository = accountRepository;
-        _roleRepository = roleRepository;
+        _accountService = accountService;
         _unitOfWork = unitOfWork;
         _requestClient = requestClient;
     }
 
+    /// <summary>
+    /// Handles user login by validating credentials,
+    /// checking roles,
+    /// and sending login events.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<UserLoginResponse> Handle(UserLoginCommand request, CancellationToken cancellationToken)
     {
         var response = new UserLoginResponse { Success = false };
-
-        // Validate user credentials
-        var account = await _accountRepository.FirstOrDefaultAsync(x => x.Email == request.UserName && x.IsActive && x.EmailConfirmed, cancellationToken);
-        if (account == null)
-        {
-            response.SetMessage(MessageId.E11001);
-            return response;
-        }
         
-        // Check if the account is locked
-        if (account.LockoutEnd.HasValue && account.LockoutEnd > DateTimeOffset.Now)
+        var (valid, messageId, account) = await _accountService.ValidateUserAsync(request.UserName!, cancellationToken);
+        if (!valid || account == null || !string.IsNullOrEmpty(messageId))
         {
-            response.SetMessage(MessageId.E11003);
+            response.SetMessage(messageId);
             return response;
         }
         
         // Begin transaction
         await _unitOfWork.BeginTransactionAsync(async () =>
         {
-            // Check password, increment-failed attempts if incorrect
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
+            // Check password
+            if (!_accountService.CheckPassword(account, request.Password!))
             {
-                account.AccessFailedCount++;
-            
-                if (account.AccessFailedCount >= 5)
-                {
-                    account.LockoutEnd = DateTimeOffset.Now + TimeSpan.FromMinutes(5);
-                }
-            
-                _accountRepository.Update(account);
-                await _unitOfWork.SaveChangesAsync(account.Email, cancellationToken);
-            
+                _accountService.LockAccount(account);
                 response.SetMessage(MessageId.E11002);
                 return false;
             }
 
-            // Check the role in the database
-            var role = await _roleRepository.FirstOrDefaultAsync(x => x.Id == account.RoleId, cancellationToken);
-            if (role == null)
+            // Get the role of the user
+            var roleName = await _accountService.GetUserRoleNameAsync(account.RoleId, cancellationToken);
+            if (string.IsNullOrEmpty(roleName))
             {
                 response.SetMessage(MessageId.E99999);
                 return false;
             }
-        
-            var @event = new UserLoginEvent
-            {
-                UserId = account.AccountId,
-            };
-        
-            // Send event to insert user
+
+            // Send login event
+            var @event = new UserLoginEvent { UserId = account.AccountId };
             var userLoginMessageResponse = await _requestClient.GetResponse<UserLoginEventResponse>(@event, cancellationToken);
             if (!userLoginMessageResponse.Message.Success)
             {
                 response.SetMessage(userLoginMessageResponse.Message.MessageId, userLoginMessageResponse.Message.Message);
                 return false;
             }
-        
-            // Reset failed attempts on successful login
-            account.AccessFailedCount = 0;
-            account.LockoutEnd = null;
-        
-            _accountRepository.Update(account);
-            await _unitOfWork.SaveChangesAsync(account.Email, cancellationToken);
 
-            var responseMessage = userLoginMessageResponse.Message.Response;
-            
-            // Set successful response
+            // Reset attempts
+            _accountService.ResetFailedAttempts(account);
+            await _unitOfWork.SaveChangesAsync(request.UserName!, cancellationToken);
+
+            var msg = userLoginMessageResponse.Message.Response;
             response.Response = new UserLoginEntity(
                 UserId: account.AccountId,
-                FullName: $"{responseMessage.FirstName} {responseMessage.LastName}",
+                FullName: $"{msg.FirstName} {msg.LastName}",
                 Email: account.Email,
-                RoleName: role.Name
+                RoleName: roleName
             );
-        
+
             // True
             response.Success = true;
             response.SetMessage(MessageId.I00001);

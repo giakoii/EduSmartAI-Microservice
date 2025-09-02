@@ -8,8 +8,6 @@ using UserService.Application.Users.Commands.Inserts;
 using UserService.Application.Users.Queries.Logins;
 using UserService.Domain.ReadModels;
 using UserService.Domain.WriteModels;
-using UtilityService.Application.Interfaces;
-using UtilityService.Infrastructure.Implements;
 
 namespace UserService.API.Extensions;
 

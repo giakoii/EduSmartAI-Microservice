@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Shared.Application.Common;
-using Shared.Application.Interfaces;
 using Shared.Application.Interfaces.Repositories;
 using Shared.Infrastructure.Contexts;
 
@@ -10,54 +9,49 @@ namespace Shared.Infrastructure.Repositories;
 public class CommandRepository<TEntity>(AppDbContext context) : ICommandRepository<TEntity> where TEntity : class
 {
     private DbSet<TEntity> DbSet => context.Set<TEntity>();
-
-    public IQueryable<TEntity> AsQueryable(Expression<Func<TEntity, bool>>? predicate = null)
-    {
-        return predicate == null ? DbSet.AsQueryable() : DbSet.Where(predicate);
-    }
-
-    /// <summary>
-    /// Find a record
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
-    {
-        if (predicate != null)
-            return await DbSet.FirstOrDefaultAsync(predicate, cancellationToken);
     
-        return await DbSet.FirstOrDefaultAsync(cancellationToken);
-    }
-
     /// <summary>
-    /// Find all records
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
-    {
-        if (predicate != null)
-            return await DbSet.Where(predicate).ToListAsync(cancellationToken);
-
-        return await DbSet.ToListAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Get paged records
+    /// Get paged entities.
     /// </summary>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <param name="predicate"></param>
+    /// <param name="orderBy"></param>
+    /// <param name="orderByDescending"></param>
     /// <param name="cancellationToken"></param>
+    /// <param name="includes"></param>
+    /// <typeparam name="TKey"></typeparam>
     /// <returns></returns>
-    public async Task<PagedResult<TEntity>> PagedAsync(int pageNumber, int pageSize, Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<TEntity>> PagedAsync<TKey>(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        Expression<Func<TEntity, TKey>>? orderBy = null,
+        bool orderByDescending = false,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[]? includes)
     {
-        var query = predicate != null ? DbSet.Where(predicate) : DbSet;
+        IQueryable<TEntity> query = DbSet;
+
+        // Apply includes
+        if (includes != null) query = includes.Aggregate(query, (current, inc) => current.Include(inc));
+
+        // Apply filter
+        if (predicate != null) query = query.Where(predicate);
+
+        // Apply sorting
+        if (orderBy != null)  query = orderByDescending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+
+        // Count total
         var totalCount = await query.CountAsync(cancellationToken);
-        var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
-    
+
+        // Apply paging
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        // Return paged result
         return new PagedResult<TEntity>
         {
             Items = items,
@@ -66,30 +60,55 @@ public class CommandRepository<TEntity>(AppDbContext context) : ICommandReposito
             PageSize = pageSize
         };
     }
-    
+
     /// <summary>
-    /// Check if an entity exists based on the provided predicate.
+    /// Get IQueryable for the entity.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="isTracking"></param>
     /// <param name="cancellationToken"></param>
+    /// <param name="includes"></param>
     /// <returns></returns>
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public IQueryable<TEntity?> Find(Expression<Func<TEntity, bool>>? predicate = null, bool isTracking = false, CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes)
     {
-        return await DbSet.AnyAsync(predicate, cancellationToken);
+        // Start with the DbSet
+        IQueryable<TEntity> query = DbSet;
+
+        // Apply the predicate if provided
+        if (predicate != null) query = query.Where(predicate);
+
+        // Apply includes
+        query = includes.Aggregate(query, (current, inc) => current.Include(inc));
+
+        // Apply tracking behavior
+        if (!isTracking) query = query.AsNoTracking();
+
+        // Return the constructed query
+        return query;
     }
-    
+
     /// <summary>
-    /// Count entities based on the provided predicate.
+    /// Get first entity matching the predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="cancellationToken"></param>
+    /// <param name="includes"></param>
     /// <returns></returns>
-    public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
+    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes)
     {
-        if (predicate != null)
-            return await DbSet.CountAsync(predicate, cancellationToken);
-    
-        return await DbSet.CountAsync(cancellationToken);
+        // Start with the DbSet
+        var query = DbSet.AsQueryable();
+        
+        // Apply the predicate if provided
+        if (predicate != null) query = query.Where(predicate);
+
+        // Apply includes
+        query = includes.Aggregate(query, (current, inc) => current.Include(inc));
+        
+        // Execute the query and return the first or default entity
+        return await query.FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     /// <summary>

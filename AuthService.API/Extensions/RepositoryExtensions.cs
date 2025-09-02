@@ -1,4 +1,5 @@
 using AuthService.Application.Accounts.Commands.Inserts;
+using AuthService.Application.Interfaces;
 using AuthService.Application.Interfaces.TokenServices;
 using AuthService.Domain.ReadModels;
 using AuthService.Domain.WriteModels;
@@ -25,6 +26,7 @@ public static class RepositoryExtensions
         
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IAccountService, AccountService>();
         
         // MediatR configuration
         services.AddMediatR(cfg => 

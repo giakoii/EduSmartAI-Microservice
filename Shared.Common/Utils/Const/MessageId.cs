@@ -76,7 +76,7 @@ public class MessageId
     public static readonly string E11004 = "E11004";
     
     /// <summary>
-    /// Password is invalid
+    /// Email is not confirmed.
     /// </summary>
     public static readonly string E11005 = "E11005";
     

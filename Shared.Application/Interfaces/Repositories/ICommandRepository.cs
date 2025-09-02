@@ -9,41 +9,43 @@ public interface ICommandRepository<TEntity> where TEntity : class
     /// Get IQueryable for the entity.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="isTracking"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="includes"></param>
     /// <returns></returns>
-    IQueryable<TEntity> AsQueryable(Expression<Func<TEntity, bool>>? predicate = null);
-    
-    /// <summary>
-    /// Get first entity matching the predicate.
-    /// </summary>
-    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Get all entities matching the predicate.
-    /// </summary>
-    Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
-    
+    IQueryable<TEntity?> Find(Expression<Func<TEntity, bool>>? predicate = null, bool isTracking = false,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[] includes);
+
+   /// <summary>
+   /// Get first entity matching the predicate.
+   /// </summary>
+   /// <param name="predicate"></param>
+   /// <param name="cancellationToken"></param>
+   /// <param name="includes"></param>
+   /// <returns></returns>
+    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
+
     /// <summary>
     /// Get paged entities.
     /// </summary>
-    Task<PagedResult<TEntity>> PagedAsync(int pageNumber, int pageSize, Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Check if entity exists.
-    /// </summary>
-    Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Count entities matching the predicate.
-    /// </summary>
-    Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
-    
+    Task<PagedResult<TEntity>> PagedAsync<TKey>(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        Expression<Func<TEntity, TKey>>? orderBy = null,
+        bool orderByDescending = false,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<TEntity, object>>[]? includes);
+
     /// <summary>
     /// Add entity to the database.
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
     Task AddAsync(TEntity entity);
-    
+
     /// <summary>
     /// Add a range of entities to the database asynchronously.
     /// </summary>
@@ -56,7 +58,7 @@ public interface ICommandRepository<TEntity> where TEntity : class
     /// </summary>
     /// <param name="entity"></param>
     void Update(TEntity entity);
-    
+
     /// <summary>
     /// Update a range of entities in the database.
     /// </summary>
