@@ -1,34 +1,43 @@
+using ReverseProxy.Authorizations;
 using ReverseProxy.Configurations;
+using ReverseProxy.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add Controllers
+builder.Services.AddControllers();
 
+// Add Authentication with OpenIdConnect/JWT
+builder.Services.AddReverseProxyAuthentication(builder.Configuration);
+
+// Add YARP Reverse Proxy (routes & clusters)
 builder.Services.AddReverseProxy()
     .LoadFromMemory(RouteConfiguration.GetRoutes(), ClusterConfiguration.GetClusters());
 
+// Add Role Authorization service
+builder.Services.AddSingleton<IRoleAuthorizationService, RoleAuthorizationService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseRouting();
-app.UseHttpsRedirection();
-
-// Map reverse proxy first
-app.MapReverseProxy();
-
-// Then configure Swagger UI
-app.UseSwaggerUi(settings =>
+app.Use(async (context, next) =>
 {
-    settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUiRoute("Auth Service Swagger", "/auth/swagger/v1/swagger.json"));
-    settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUiRoute("User Service Swagger", "/user/swagger/v1/swagger.json"));
-    settings.Path = "/swagger";
+    context.Request.EnableBuffering();
+    await next();
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseHttpsRedirection();
+app.UseMiddleware<RoleAuthorizationMiddleware>();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint and the Swagger UI
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.ConfigureSwaggerUi();
+}
+
+app.MapControllers();
+app.MapReverseProxy();
 app.Run();

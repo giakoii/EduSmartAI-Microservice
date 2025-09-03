@@ -9,7 +9,10 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
         <PackageReference Include="NSwag.AspNetCore" Version="14.5.0" />
+        <PackageReference Include="OpenIddict.Validation.SystemNetHttp" Version="7.0.0" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+        <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>

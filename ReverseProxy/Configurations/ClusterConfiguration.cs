@@ -4,7 +4,7 @@ using Yarp.ReverseProxy.Configuration;
 
 namespace ReverseProxy.Configurations;
 
-public class ClusterConfiguration
+public static class ClusterConfiguration
 {
     public static IReadOnlyList<ClusterConfig> GetClusters()
     {

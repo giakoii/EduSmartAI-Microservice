@@ -95,8 +95,6 @@ public static class AuthenticationExtensions
         options.AllowCustomFlow("logout");
         options.AllowCustomFlow("external");
         options.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
-        
-        options.AcceptAnonymousClients();
     }
     
     private static void ConfigureScopes(OpenIddictServerBuilder options)
