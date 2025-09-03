@@ -22,7 +22,7 @@ public abstract class AbstractApiAsyncControllerNotToken
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public abstract Task<TResponse> Exec(TRequest request);
+    protected abstract Task<TResponse> Exec(TRequest request);
 
     /// <summary>
     /// TemplateMethod

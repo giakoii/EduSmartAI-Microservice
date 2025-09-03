@@ -13,7 +13,7 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
     {
-        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.AuthServiceDB);
+        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.AuthServiceDb);
         
         // C#
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,password=Gi@khoi221203,allowAdmin=true"));        

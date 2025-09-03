@@ -39,7 +39,7 @@ public class SelectUserProfileController : AbstractApiAsyncController<UserProfil
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public override async Task<UserProfileSelectResponse> Exec(UserProfileSelectQuery request)
+    protected override async Task<UserProfileSelectResponse> Exec(UserProfileSelectQuery request)
     {
         return await _mediator.Send(request);
     }

@@ -11,7 +11,7 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
     {
-        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.UtilityServiceDB);
+        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.UtilityServiceDb);
         
         // Entity Framework configuration
         services.AddDbContext<UtilityServiceContext>(options =>

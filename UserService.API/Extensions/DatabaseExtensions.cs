@@ -15,7 +15,7 @@ public static class DatabaseExtensions
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
     {
         EnvLoader.Load();
-        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.UserServiceDB);
+        var connectionString = Environment.GetEnvironmentVariable(ConstEnv.UserServiceDb);
         
         services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect("localhost:6379,password=Gi@khoi221203,allowAdmin=true"));        

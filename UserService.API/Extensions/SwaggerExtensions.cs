@@ -12,8 +12,8 @@ public static class SwaggerExtensions
         
         services.AddOpenApiDocument(config =>
         {
-            config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT Token"));
-            config.AddSecurity("JWT Token", [],
+            config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT_Token"));
+            config.AddSecurity("JWT_Token", [],
                 new OpenApiSecurityScheme()
                 {
                     Type = OpenApiSecuritySchemeType.ApiKey,

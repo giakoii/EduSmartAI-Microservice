@@ -42,7 +42,7 @@ public class InsertStudentController : AbstractApiAsyncControllerNotToken<Studen
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public override async Task<StudentInsertResponse> Exec(StudentInsertCommand request)
+    protected override async Task<StudentInsertResponse> Exec(StudentInsertCommand request)
     {
         return await _mediator.Send(request);
     }
