@@ -42,7 +42,7 @@ app.MapControllers();
 app.UseSwagger();
 app.UseSwaggerUI(settings =>
 {
-    settings.RoutePrefix = "/swagger";
+    settings.RoutePrefix = "swagger";
 });
 app.Run();
 #endregion
