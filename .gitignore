@@ -1,6 +1,8 @@
 # Bỏ qua thư mục build
 bin/
 obj/
+out/
+artifacts/
 
 # Bỏ qua thư mục của IDE (Visual Studio, Rider, VS Code)
 .vs/
@@ -20,9 +22,27 @@ Thumbs.db
 .env
 **/.env
 
+# Logs & temp
+*.log
+*.tmp
 
 # Bỏ qua các file user settings
 *.user
 *.userosscache
 *.suo
 *.sln.docstates
+
+# App settings (giữ lại appsettings.json mẫu, bỏ qua env-specific)
+appsettings.*.json
+!appsettings.json
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# .NET user secrets
+secrets.json
+
+# Publish output
+wwwroot/
