@@ -1,6 +1,4 @@
-using System.Net;
-using NSwag;
-using NSwag.Generation.Processors.Security;
+using Microsoft.OpenApi.Models;
 
 namespace UtilityService.API.Extensions;
 
@@ -10,20 +8,36 @@ public static class SwaggerExtensions
     {
         services.AddOpenApi();
         
-        services.AddOpenApiDocument(config =>
+        services.AddSwaggerGen(c =>
         {
-            config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT_Token"));
-            config.AddSecurity("JWT_Token", [],
-                new OpenApiSecurityScheme()
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "User Service",
+                Version = "v1"
+            });
+        
+            c.AddSecurityDefinition("JWT_Token", new OpenApiSecurityScheme
+            {
+                Description = "Copy this into the value field: Bearer {token}",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey
+            });
+        
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = nameof(Authorization),
-                    In = OpenApiSecurityApiKeyLocation.Header,
-                    Description = "Copy this into the value field: Bearer {token}",
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "JWT_Token"
+                        }
+                    },
+                    []
                 }
-            );
-            config.Title = "Utility Service";
-            config.Version = "v1";
+            });
         });
         
         return services;

@@ -40,9 +40,7 @@ public static class ConstEnv
     
     public const string AiServiceUrl = "AI_SERVICE_URL";
     
-    public const string ReverseProxyClientSecret = "REVERSE_PROXY_CLIENT_SECRET";
-    
     public const string JwtAudience = "JWT_AUDIENCE";
     
-    public const string AuthClientId = "AUTH_CLIENT_ID";
+    public const string ClientId = "CLIENT_ID";
 }

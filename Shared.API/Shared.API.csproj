@@ -10,11 +10,8 @@
         <PackageReference Include="MediatR" Version="13.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
         <PackageReference Include="Npgsql" Version="9.0.3" />
-        <PackageReference Include="NSwag.AspNetCore" Version="14.5.0" />
-        <PackageReference Include="NSwag.MSBuild" Version="14.5.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
     </ItemGroup>
 
     <ItemGroup>

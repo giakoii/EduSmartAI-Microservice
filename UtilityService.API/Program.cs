@@ -39,9 +39,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
-app.UseOpenApi();
-app.UseSwaggerUi(settings =>
+app.UseSwagger();
+app.UseSwaggerUI(settings =>
 {
-    settings.Path = "/swagger";
-});app.Run();
+    settings.RoutePrefix = "/swagger";
+});
+app.Run();
 #endregion
