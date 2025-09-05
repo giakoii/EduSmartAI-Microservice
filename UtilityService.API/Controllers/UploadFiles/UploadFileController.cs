@@ -75,7 +75,7 @@ public class UploadFileController : ControllerBase
         
         // True
         response.Success = true;
-        response.SetMessage(MessageId.I00001);
+        response.SetMessage(MessageId.I00001, "Upload");
         return response;
     }
 }

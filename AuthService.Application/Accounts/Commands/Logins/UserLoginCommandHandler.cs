@@ -87,7 +87,7 @@ public class UserLoginCommandHandler : ICommandHandler<UserLoginCommand, UserLog
 
             // True
             response.Success = true;
-            response.SetMessage(MessageId.I00001);
+            response.SetMessage(MessageId.I00001, "Đăng nhập");
             return true;
         }, cancellationToken);
         return response;

@@ -33,6 +33,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+await app.EnsureDatabaseCreatedAsync();
+
 app.UseCors();
 app.UseRouting();
 app.UseAuthentication();

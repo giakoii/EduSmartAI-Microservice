@@ -22,15 +22,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks", "BuildingBlocks\BuildingBlocks.csproj", "{002CA456-9562-4D68-9483-C572F9C9E5E9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserService", "UserService", "{954406EA-9C45-4043-950A-3CAB266F7405}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StudentService", "StudentService", "{954406EA-9C45-4043-950A-3CAB266F7405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.API", "UserService.API\UserService.API.csproj", "{79E526AB-A163-4542-B715-C3672FA84C08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentService.API", "StudentService.API\StudentService.API.csproj", "{79E526AB-A163-4542-B715-C3672FA84C08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Application", "UserService.Application\UserService.Application.csproj", "{71A9445F-31C1-4381-A87A-5B2E48218F59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentService.Application", "StudentService.Application\StudentService.Application.csproj", "{71A9445F-31C1-4381-A87A-5B2E48218F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Infrastructure", "UserService.Infrastructure\UserService.Infrastructure.csproj", "{C6B51167-EF1E-44ED-BC6F-DB522C51E3A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentService.Infrastructure", "StudentService.Infrastructure\StudentService.Infrastructure.csproj", "{C6B51167-EF1E-44ED-BC6F-DB522C51E3A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Domain", "UserService.Domain\UserService.Domain.csproj", "{A4957E94-47A5-4867-80ED-C7A9772F18FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentService.Domain", "StudentService.Domain\StudentService.Domain.csproj", "{A4957E94-47A5-4867-80ED-C7A9772F18FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Messaging", "BuildingBlocks.Messaging\BuildingBlocks.Messaging.csproj", "{8AC06C41-D226-46F3-B7FB-622DE3B73A33}"
 EndProject
@@ -53,6 +53,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityService.Domain", "UtilityService.Domain\UtilityService.Domain.csproj", "{E7151F67-B898-4BE8-931D-7B45316D40C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityService.Infrastructure", "UtilityService.Infrastructure\UtilityService.Infrastructure.csproj", "{CB94128C-6146-4303-9625-4C5433DC8784}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35BD3CF2-2114-4ED2-9918-8E2095588CF1}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+		.env = .env
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

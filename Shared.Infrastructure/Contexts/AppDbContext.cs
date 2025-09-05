@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NLog;
+using Shared.Application.Utils;
 
 namespace Shared.Infrastructure.Contexts;
 
@@ -38,7 +39,7 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
             .Select(e => e.Entity);
 
         // Get current time
-        var now = DateTime.UtcNow;
+        var now = StringUtil.ConvertToVietNamTime();
 
         // Set newEntities
         foreach (dynamic newEntity in newEntities)

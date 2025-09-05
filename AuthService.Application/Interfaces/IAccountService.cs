@@ -1,4 +1,5 @@
 using AuthService.Application.Accounts.Commands.Inserts;
+using AuthService.Application.Accounts.Commands.Verifies;
 using AuthService.Domain.WriteModels;
 
 namespace AuthService.Application.Interfaces;
@@ -46,4 +47,11 @@ public interface IAccountService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<string?> GetUserRoleNameAsync(Guid roleId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Verifies the account using the provided request key.
+    /// </summary>
+    /// <param name="requestKey"></param>
+    /// <returns></returns>
+    Task<AccountVerifyResponse> VerifyAccount(string requestKey);
 }

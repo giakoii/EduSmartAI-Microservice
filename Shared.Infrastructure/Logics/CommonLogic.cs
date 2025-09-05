@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Shared.Application.Interfaces;
 using Shared.Application.Interfaces.Commons;
+using Shared.Application.Utils.Const;
 using Shared.Common.Settings;
 using Shared.Common.Utils.Const;
 
@@ -17,11 +18,9 @@ public class CommonLogic : ICommonLogic
     /// </summary>
     /// <param name="beforeEncrypt"></param>
     /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public string EncryptText(string beforeEncrypt)
+    public EncryptTextResponse EncryptText(string beforeEncrypt)
     {
-        // Check for null or empty
-        ArgumentException.ThrowIfNullOrEmpty(beforeEncrypt);
+        var response = new EncryptTextResponse {Success = false};
         
         // Get the key and IV from configuration
         EnvLoader.Load();
@@ -32,7 +31,8 @@ public class CommonLogic : ICommonLogic
         // Check for null
         if (key == null)
         {
-            throw new ArgumentException();
+            response.SetMessage(MessageId.E99999);
+            return response;
         }
         // Encrypt the text
         using Aes aes = Aes.Create();
@@ -44,14 +44,20 @@ public class CommonLogic : ICommonLogic
         // Encrypt
         var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
         using var ms = new MemoryStream();
-        using var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
-        using var sw = new StreamWriter(cs);
+        using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+        using (var sw = new StreamWriter(cs))
+        {
+            sw.Write(beforeEncrypt);
+        }     
         
-        // Write the text to be encrypted
-        sw.Write(beforeEncrypt);
+        response.Response = new EncryptTextResponseEntity
+        {
+            EncryptedKey = Convert.ToBase64String(ms.ToArray())
+        };
         
-        // Flush and close the stream
-        return Convert.ToBase64String(ms.ToArray());
+        // True
+        response.Success = true;
+        return response;
     }
 
     /// <summary>
@@ -60,10 +66,9 @@ public class CommonLogic : ICommonLogic
     /// <param name="beforeDecrypt"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public string DecryptText(string beforeDecrypt)
+    public DecryptTextResponse DecryptText(string beforeDecrypt)
     {
-        // Check for null or empty
-        ArgumentException.ThrowIfNullOrEmpty(beforeDecrypt);
+        var response = new DecryptTextResponse {Success = false};
         
         EnvLoader.Load();
         
@@ -73,10 +78,11 @@ public class CommonLogic : ICommonLogic
         // Check for null
         if (key == null)
         {
-            throw new ArgumentException();
+            response.SetMessage(MessageId.E99999);
+            return response;
         }
         // Decrypt the text
-        using Aes aes = Aes.Create();
+        var aes = Aes.Create();
         
         // Set the key and IV
         aes.Key = Encoding.UTF8.GetBytes(key);
@@ -87,7 +93,25 @@ public class CommonLogic : ICommonLogic
         using var ms = new MemoryStream(Convert.FromBase64String(beforeDecrypt));
         using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
         using var sr = new StreamReader(cs);
-        return sr.ReadToEnd();
+        var decrypted = sr.ReadToEnd();
+
+        var parts = decrypted.Split('-', 2);
+        if (parts.Length != 2 || !Guid.TryParse(parts[1], out var id))
+        {
+            response.SetMessage(MessageId.E99999);
+            return response;
+        }
+
+        // Read the decrypted text
+        response.Response = new DecryptTextResponseEntity
+        {
+            Email = parts[0],
+            Id = Guid.Parse(parts[1])
+        };
+        
+        // True
+        response.Success = true;
+        return response;
     }
     
     /// <summary>
@@ -174,5 +198,4 @@ public class CommonLogic : ICommonLogic
         // Format as a 6-digit string with leading zeros if needed
         return value.ToString("D6");
     }
-    
 }

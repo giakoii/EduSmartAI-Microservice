@@ -17,6 +17,8 @@ public partial class UtilityServiceContext : AppDbContext
 
     public virtual DbSet<Systemconfig> Systemconfigs { get; set; }
 
+    public virtual DbSet<VwVerifyaccount> VwVerifyaccounts { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CloudinaryConfig>(entity =>
@@ -97,6 +99,19 @@ public partial class UtilityServiceContext : AppDbContext
                 .HasMaxLength(50)
                 .HasColumnName("updated_by");
             entity.Property(e => e.Value).HasColumnName("value");
+        });
+
+        modelBuilder.Entity<VwVerifyaccount>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("vw_verifyaccount");
+
+            entity.Property(e => e.Body).HasColumnName("body");
+            entity.Property(e => e.ScreenName)
+                .HasMaxLength(255)
+                .HasColumnName("screen_name");
+            entity.Property(e => e.Title).HasColumnName("title");
         });
 
         OnModelCreatingPartial(modelBuilder);
