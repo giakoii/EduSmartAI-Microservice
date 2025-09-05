@@ -29,7 +29,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 var app = builder.Build();
-
+app.UseForwardedHeaders();
 // Ensure the database is created
 await app.EnsureDatabaseCreatedAsync();
 
@@ -43,11 +43,6 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UsePathBase("/auth");
 app.UseRouting();
-app.Use(async (context, next) =>
-{
-    context.Request.EnableBuffering();
-    await next();
-});
 app.UseAuthentication();
 app.UseStatusCodePages();
 app.UseAuthorization();

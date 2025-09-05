@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
+using Shared.Common.Settings;
+using Shared.Common.Utils.Const;
 using Shared.Infrastructure.Contexts;
 
 namespace AuthService.API.Extensions;
@@ -9,6 +11,7 @@ public static class AuthenticationExtensions
 {
     public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
     {
+        EnvLoader.Load();
         services.AddOpenIddict()
             .AddCore(options =>
             {
@@ -17,7 +20,7 @@ public static class AuthenticationExtensions
             })
             .AddServer(options =>
             {
-                options.SetIssuer(new Uri("http://localhost:5001/auth/")); 
+                options.SetIssuer(new Uri(Environment.GetEnvironmentVariable(ConstEnv.AuthServiceUrl)!)); 
                 ConfigureEndpoints(options);
                 ConfigureFlows(options);
                 ConfigureScopes(options);

@@ -19,31 +19,12 @@ public static class RouteConfiguration
                 },
                 Transforms =
                 [
-                    new Dictionary<string,string> { { "PathRemovePrefix", "/auth" } }
+                    new Dictionary<string, string> { { "RequestHeaderOriginalHost", "true" } },
                 ],
                 Metadata = new Dictionary<string, string>
                 {
                     { "AllowedRoles", "Anonymous" },
                     { "Exceptions", "" }
-                }
-            },
-            
-            new RouteConfig
-            {
-                RouteId = "userServiceRoute",
-                ClusterId = ConstReverseProxy.UserServiceClusterId,
-                Match = new RouteMatch
-                {
-                    Path = "/user/{**catch-all}"
-                },
-                Transforms =
-                [
-                    new Dictionary<string, string> { { "PathRemovePrefix", "/user" } }
-                ],
-                Metadata = new Dictionary<string,string>
-                {
-                    { "AllowedRoles", "Admin,User" },
-                    { "Exceptions", "GET:/public-profile,POST:/notify" }
                 }
             },
             
@@ -72,7 +53,12 @@ public static class RouteConfiguration
                 Transforms =
                 [
                     new Dictionary<string, string> { { "PathRemovePrefix", "/student" } }
-                ]
+                ],
+                Metadata = new Dictionary<string, string>
+                {
+                    { "AllowedRoles", "Student" },
+                    { "Exceptions", "" }
+                }
             }
         };
     }

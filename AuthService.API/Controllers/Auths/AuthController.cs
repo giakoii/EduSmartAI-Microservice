@@ -34,23 +34,27 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Exchange token
     /// </summary>
-    /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("~/connect/token")]
     [Consumes("application/x-www-form-urlencoded")]
     [Produces("application/json")]
-    public async Task<IActionResult> Exchange([FromForm] UserLoginCommand request)
+    public async Task<IActionResult> Exchange()
     {
         var openIdRequest = HttpContext.GetOpenIddictServerRequest();
+        
+        var request = new UserLoginCommand(
+            UserName: openIdRequest!.Username,
+            Password: openIdRequest.Password
+        );
 
         // Password
-        if (openIdRequest!.IsPasswordGrantType())
+        if (openIdRequest.IsPasswordGrantType())
         {
             return await TokensForPasswordGrantType(request);
         }
 
         // Refresh token
-        if (openIdRequest!.IsRefreshTokenGrantType())
+        if (openIdRequest.IsRefreshTokenGrantType())
         {
             return await TokensForRefreshTokenGrantType();
         }
@@ -61,7 +65,7 @@ public class AuthController : ControllerBase
             Error = OpenIddictConstants.Errors.UnsupportedGrantType
         });
     }
-    
+
     /// <summary>
     /// Logout endpoint - revoke tokens properly
     /// </summary>
@@ -144,9 +148,10 @@ public class AuthController : ControllerBase
                 errorResponse.Error = OpenIddictConstants.Errors.InvalidGrant;
                 errorResponse.ErrorDescription = "An unexpected error occurred during login.";
             }
+
             return BadRequest(errorResponse);
         }
-        
+
         var loginResponse = loginResult.Response;
 
         var userLoginDto = new UserLoginDto
@@ -172,7 +177,8 @@ public class AuthController : ControllerBase
         try
         {
             // Authenticate the refresh token
-            var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var authenticateResult =
+                await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             if (!authenticateResult.Succeeded)
             {
                 return Unauthorized(new OpenIddictResponse
@@ -181,10 +187,10 @@ public class AuthController : ControllerBase
                     ErrorDescription = "The refresh token is invalid."
                 });
             }
-            
+
             var claimsPrincipal = authenticateResult.Principal;
             var newClaimsPrincipal = await _tokenService.GenerateClaimsPrincipal(claimsPrincipal);
-            
+
             return SignIn(newClaimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
         catch (Exception)

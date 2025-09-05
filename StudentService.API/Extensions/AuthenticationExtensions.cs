@@ -18,7 +18,7 @@ public static class AuthenticationExtensions
        services.AddOpenIddict()
            .AddValidation(options =>
            {
-               options.SetIssuer("http://localhost:5001/auth/");
+               options.SetIssuer("http://localhost:5050");
                options.AddAudiences("service_client");
 
                options.UseIntrospection()

@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseRouting();
-app.UsePathBase("/user");
+app.UsePathBase("/student");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();

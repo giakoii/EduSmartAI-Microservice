@@ -46,6 +46,8 @@ public class RoleAuthorizationService : IRoleAuthorizationService
     /// <returns></returns>
     public Task<bool> CheckAccessAsync(string servicePrefix, string relativePath, string method, ClaimsPrincipal user, CancellationToken cancellationToken = default)
     {
+        var identity = user?.Identity as ClaimsIdentity;
+        
         // If service prefix not found, deny by default
         if (!_map.TryGetValue(servicePrefix, out var meta))
         {
@@ -68,11 +70,11 @@ public class RoleAuthorizationService : IRoleAuthorizationService
             return Task.FromResult(true);
 
         // 3. If user not authenticated => deny
-        if (user?.Identity == null || !user.Identity.IsAuthenticated)
+        if (identity == null || !identity.IsAuthenticated)
             return Task.FromResult(false);
 
         // 4. Extract user roles from claims
-        var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "role" || c.Type == "roles")
+        var roles = user?.Claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "role" || c.Type == "roles")
             .Select(c => c.Value)
             .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries))
             .Select(x => x.Trim())
@@ -122,9 +124,9 @@ public class RoleAuthorizationService : IRoleAuthorizationService
             
             // If method is "*", treat as all methods (for simplicity, we can store under key "*")
             var path = NormalizePath(parts[1].Trim());
-            if (!dict.TryGetValue(method, out var list))
+            if (!dict.TryGetValue(method, out _))
             {
-                dict[method] = new[] { path };
+                dict[method] = [path];
             }
             
             // Append to existing list

@@ -21,8 +21,7 @@ public class UserProfileSelectQueryHandler : IQueryHandler<UserProfileSelectQuer
         _identityService = identityService;
     }
 
-    public async Task<UserProfileSelectResponse> Handle(UserProfileSelectQuery request,
-        CancellationToken cancellationToken)
+    public async Task<UserProfileSelectResponse> Handle(UserProfileSelectQuery request, CancellationToken cancellationToken)
     {
         var response = new UserProfileSelectResponse { Success = false };
 
