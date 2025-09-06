@@ -53,7 +53,7 @@ public class TokenService : ITokenService
         {
             return claim.Type switch
             {
-                _ => new[] { OpenIddictConstants.Destinations.AccessToken }
+                _ => new[] { OpenIddictConstants.Destinations.AccessToken, OpenIddictConstants.Destinations.IdentityToken }
             };
         });
         
@@ -61,7 +61,8 @@ public class TokenService : ITokenService
         claimsPrincipal.SetScopes(
             OpenIddictConstants.Scopes.Roles, 
             OpenIddictConstants.Scopes.OfflineAccess, 
-            OpenIddictConstants.Scopes.Profile);
+            OpenIddictConstants.Scopes.Profile,
+            OpenIddictConstants.Scopes.OpenId);
 
         // Set resources
         var resources = await _scopeManager.ListResourcesAsync(claimsPrincipal.GetScopes()).ToListAsync();

@@ -36,8 +36,8 @@ public static class AuthenticationExtensions
                 options.AddAudiences(audience!);
 
                 // Get client credentials from environment variables
-                var clientId = Environment.GetEnvironmentVariable(ConstEnv.AuthClientId);
-                var clientSecret = Environment.GetEnvironmentVariable(ConstEnv.ReverseProxyClientSecret);
+                var clientId = Environment.GetEnvironmentVariable(ConstEnv.ClientId);
+                var clientSecret = Environment.GetEnvironmentVariable(ConstEnv.ClientSecret);
 
                 // Use introspection endpoint to validate token
                 options.UseIntrospection()

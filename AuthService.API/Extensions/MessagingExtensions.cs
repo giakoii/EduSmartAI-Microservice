@@ -10,7 +10,7 @@ public static class MessagingExtensions
         {
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("rabbitmq://localhost");
+                cfg.ConfigureEndpoints(context);
             });
         });
         

@@ -10,7 +10,7 @@ public static class ClusterConfiguration
     {
         EnvLoader.Load();
         var authServiceUrl = Environment.GetEnvironmentVariable(ConstEnv.AuthServiceUrl);
-        var userServiceUrl = Environment.GetEnvironmentVariable(ConstEnv.UserServiceUrl);
+        var studentServiceUrl = Environment.GetEnvironmentVariable(ConstEnv.UserServiceUrl);
         
         return new List<ClusterConfig>
         {
@@ -27,7 +27,7 @@ public static class ClusterConfiguration
                 ClusterId = ConstReverseProxy.UserServiceClusterId,
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
-                    { "destination2", new DestinationConfig { Address = userServiceUrl! } }
+                    { "destination2", new DestinationConfig { Address = studentServiceUrl! } }
                 }
             }
         };

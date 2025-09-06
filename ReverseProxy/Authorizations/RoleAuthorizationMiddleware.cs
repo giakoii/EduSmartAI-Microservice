@@ -64,7 +64,7 @@ public class RoleAuthorizationMiddleware
                 message = "Access Denied: You do not have permission to access this resource",
                 statusCode = StatusCodes.Status403Forbidden,
             };
-
+            
             // Set response status code and content type
             await context.Response.WriteAsJsonAsync(response);
             return;

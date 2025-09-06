@@ -12,26 +12,33 @@ builder.Services.AddReverseProxyAuthentication(builder.Configuration);
 
 // Add YARP Reverse Proxy (routes & clusters)
 builder.Services.AddReverseProxy()
-    .LoadFromMemory(RouteConfiguration.GetRoutes(), ClusterConfiguration.GetClusters());
+    .LoadFromMemory(
+        RouteConfiguration.GetRoutes(),
+        ClusterConfiguration.GetClusters()
+    )
+    .ConfigureHttpClient((context, handler) =>
+    {
+        handler.AllowAutoRedirect = false;
+    });
 
 // Add Role Authorization service
 builder.Services.AddSingleton<IRoleAuthorizationService, RoleAuthorizationService>();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseRouting();
+
 app.Use(async (context, next) =>
 {
     context.Request.EnableBuffering();
+    context.Request.Body.Position = 0; // Reset để OpenIddict đọc lại
     await next();
 });
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
-app.UseMiddleware<RoleAuthorizationMiddleware>();
-
-// Enable middleware to serve generated Swagger as a JSON endpoint and the Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
@@ -40,4 +47,5 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.MapReverseProxy();
+app.UseMiddleware<RoleAuthorizationMiddleware>();
 app.Run();

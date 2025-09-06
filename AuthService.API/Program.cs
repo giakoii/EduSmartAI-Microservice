@@ -29,7 +29,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 var app = builder.Build();
-
+app.UseForwardedHeaders();
 // Ensure the database is created
 await app.EnsureDatabaseCreatedAsync();
 
@@ -48,9 +48,9 @@ app.UseStatusCodePages();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
-app.UseOpenApi();
-app.UseSwaggerUi(settings =>
+app.UseSwagger();
+app.UseSwaggerUI(settings =>
     {
-        settings.Path = "/swagger";
+        settings.RoutePrefix = "swagger";
     });
 app.Run();
