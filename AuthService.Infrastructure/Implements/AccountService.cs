@@ -75,14 +75,6 @@ public class AccountService : IAccountService
             // Delete and recreate the account if email is not confirmed and created more than 5 minutes ago
             if (!existingAccount.EmailConfirmed)
             {
-                var userCollectionExisting = await _accountQueryRepository
-                    .FirstOrDefaultAsync(x => x.Email == request.Email && x.IsActive);
-                if (userCollectionExisting == null)
-                {
-                    response.SetMessage(MessageId.E11001);
-                    return response;
-                }
-
                 // If the account was created more than 5 minutes ago
                 if (existingAccount.CreatedAt < StringUtil.ConvertToVietNamTime().AddMinutes(-5))
                 {
@@ -92,9 +84,13 @@ public class AccountService : IAccountService
                         _accountCommandRepository.Update(existingAccount);
                         await _unitOfWork.SaveChangesAsync(existingAccount.Email, cancellationToken, true);
 
-                        // Delete from AccountCollection
-                        _unitOfWork.Delete(AccountCollection.FromWriteModel(existingAccount, userCollectionExisting.UserInformation));
-                        await _unitOfWork.SessionSaveChangesAsync();
+                        var userCollectionExisting = await _accountQueryRepository.FirstOrDefaultAsync(x => x.Email == request.Email && x.IsActive);
+                        if (userCollectionExisting != null)
+                        {
+                            // Delete from AccountCollection
+                            _unitOfWork.Delete(AccountCollection.FromWriteModel(existingAccount, userCollectionExisting.UserInformation));
+                            await _unitOfWork.SessionSaveChangesAsync();
+                        }
 
                         // Insert new account
                         var newUser = await InsertAccountAsync(request, role.Id);
